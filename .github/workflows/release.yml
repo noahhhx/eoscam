@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    # The oldest supported Ubuntu, so the binary's glibc requirement is low enough
+    # for it and every newer distro (Arch, Fedora, ...). libgphoto2 is linked
+    # dynamically and has the same soname everywhere.
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgphoto2-dev libclang-dev pkg-config
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --locked
+      - run: cargo build --release --locked
+      - run: cp target/release/eoscam eoscam-x86_64-linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eoscam-x86_64-linux
+          path: eoscam-x86_64-linux
+      - if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: eoscam-x86_64-linux

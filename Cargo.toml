@@ -1,0 +1,13 @@
+[package]
+name = "eoscam"
+version = "0.1.0"
+edition = "2024"
+description = "Use a Canon EOS camera as a webcam via v4l2loopback"
+license = "MIT"
+
+[dependencies]
+gphoto2 = "3.4.1"
+libc = "0.2.190"
+nix = { version = "0.31.3", features = ["ioctl"] }
+signal-hook = "0.4.5"
+zune-jpeg = "0.5.15"
